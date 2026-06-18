@@ -20,7 +20,6 @@ class Settings(BaseSettings):
 
     # LLM API Keys
     GEMINI_API_KEY: SecretStr
-    ANTHROPIC_API_KEY: SecretStr
 
     # PostgreSQL connection parameters
     DB_HOST: str
