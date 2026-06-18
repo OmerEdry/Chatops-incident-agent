@@ -3,8 +3,10 @@ import logging
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
+import uvicorn
 from fastapi import FastAPI
 
+from src.api.routes import router
 from src.core.config import get_settings
 from src.db import init_db
 
@@ -37,3 +39,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(title="ChatOps Incident Agent", lifespan=lifespan)
+
+app.include_router(router)
+
+
+@app.get("/api/v1/health")
+async def health_check() -> dict[str, str]:
+    return {"status": "ok", "service": "chatops-agent"}
+
+
+if __name__ == "__main__":
+    uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)
