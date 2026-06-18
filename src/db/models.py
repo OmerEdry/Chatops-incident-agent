@@ -45,13 +45,13 @@ class Incident(Base):
     )
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     status: Mapped[IncidentStatus] = mapped_column(
-        Enum(IncidentStatus, name="incidentstatus"),
+        Enum(IncidentStatus, name="incidentstatus", values_callable=lambda obj: [e.value for e in obj]),
         nullable=False,
         default=IncidentStatus.OPEN,
         server_default=IncidentStatus.OPEN.value,
     )
     severity: Mapped[IncidentSeverity] = mapped_column(
-        Enum(IncidentSeverity, name="incidentseverity"), nullable=False
+        Enum(IncidentSeverity, name="incidentseverity", values_callable=lambda obj: [e.value for e in obj]), nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
@@ -81,7 +81,7 @@ class IncidentMessage(Base):
         nullable=False,
     )
     sender: Mapped[SenderType] = mapped_column(
-        Enum(SenderType, name="sendertype"), nullable=False
+        Enum(SenderType, name="sendertype", values_callable=lambda obj: [e.value for e in obj]), nullable=False
     )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     raw_payload: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
