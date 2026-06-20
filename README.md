@@ -26,7 +26,10 @@ The entire system is containerized, CI/CD-enabled, and production-ready. A **Git
 
 ## 📸 Visual Proof
 
-> ![P1 Critical Alert - Discord](discord-alert.png).
+> <div align="center">
+  <img src="docs/discord-alert-pic-p1.png" width="400" alt="P1 Critical Alert - Discord">
+  <img src="docs/discord-alert-pic-p2.png" width="400" alt="P2 High Alert - Discord">
+</div>
 >
 > *The Discord notification below is triggered automatically for P1/P2 incidents, showing the AI-generated root cause, severity badge, and recommended actions.*
 
