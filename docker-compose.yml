@@ -16,5 +16,23 @@ services:
       timeout: 5s
       retries: 5
 
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: chatops_user
+      DB_PASSWORD: chatops_password
+      DB_NAME: chatops_db
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   postgres_data:
