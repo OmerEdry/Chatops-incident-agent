@@ -1,9 +1,10 @@
 # src/api/routes.py
 import logging
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, HTTPException, status
 
 from src.api.schemas import IncomingWebhookPayload
+from src.services.discord import send_discord_alert
 from src.services.router import route_incident
 from src.services.schemas import IncidentAnalysisResult
 
@@ -17,7 +18,10 @@ router = APIRouter()
     response_model=IncidentAnalysisResult,
     status_code=status.HTTP_200_OK,
 )
-async def handle_incident_webhook(payload: IncomingWebhookPayload) -> IncidentAnalysisResult:
+async def handle_incident_webhook(
+    payload: IncomingWebhookPayload,
+    background_tasks: BackgroundTasks,
+) -> IncidentAnalysisResult:
     context = (
         f"{payload.title}\n{payload.description}"
         if payload.description
@@ -41,5 +45,8 @@ async def handle_incident_webhook(payload: IncomingWebhookPayload) -> IncidentAn
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Upstream AI service pipeline failed. Please retry.",
         ) from exc
+
+    if result.routed_to_claude:
+        background_tasks.add_task(send_discord_alert, result)
 
     return result

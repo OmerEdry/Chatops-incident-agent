@@ -123,3 +123,42 @@ def test_incident_webhook_missing_required_fields_returns_422(client):
         json={"source": "github"},  # missing incident_id and title
     )
     assert response.status_code == 422
+
+
+# ---------------------------------------------------------------------------
+# Discord background task — notification routing
+# ---------------------------------------------------------------------------
+
+def test_discord_alert_triggered_for_p2(client):
+    with patch("src.api.routes.route_incident", new_callable=AsyncMock, return_value=_MOCK_RESULT_P2):
+        with patch("src.api.routes.send_discord_alert", new_callable=AsyncMock) as mock_discord:
+            response = client.post(
+                "/api/v1/webhooks/incident",
+                json={
+                    "source": "pagerduty",
+                    "incident_id": "INC-004",
+                    "title": "High CPU on prod-api-01",
+                    "description": "CPU sustained above 95% for 10 minutes",
+                    "raw_data": {},
+                },
+            )
+
+    assert response.status_code == 200
+    mock_discord.assert_awaited_once_with(_MOCK_RESULT_P2)
+
+
+def test_discord_alert_not_triggered_for_p4(client):
+    with patch("src.api.routes.route_incident", new_callable=AsyncMock, return_value=_MOCK_RESULT_P4):
+        with patch("src.api.routes.send_discord_alert", new_callable=AsyncMock) as mock_discord:
+            response = client.post(
+                "/api/v1/webhooks/incident",
+                json={
+                    "source": "github",
+                    "incident_id": "INC-005",
+                    "title": "Scheduled job completed",
+                    "raw_data": {},
+                },
+            )
+
+    assert response.status_code == 200
+    mock_discord.assert_not_awaited()

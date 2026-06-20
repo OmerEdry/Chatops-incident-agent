@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # LLM API Keys
     GEMINI_API_KEY: SecretStr
 
+    # Notification integrations
+    DISCORD_WEBHOOK_URL: SecretStr | None = None
+
     # PostgreSQL connection parameters
     DB_HOST: str
     DB_PORT: int = 5432
